@@ -1,5 +1,5 @@
 {
-  "name": "remix-hoici",
+  "name": "remix-starter",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -38,6 +38,7 @@
     "date-fns": "^4.1.0",
     "express": "^4.19.2",
     "express-rate-limit": "^7.4.1",
+    "framer-motion": "^11.11.13",
     "get-port": "^7.1.0",
     "glob": "^11.0.0",
     "isbot": "^4.1.0",
