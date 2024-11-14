@@ -1,3 +1,4 @@
+import { type LinksFunction } from "@remix-run/node";
 import {
   Links,
   Meta,
@@ -5,9 +6,8 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import type { LinksFunction } from "@remix-run/node";
 
-import tailwindStylesheetUrl from "#app/styles/tailwind.css";
+import tailwindStylesheetUrl from "#app/styles/tailwind.css?url";
 
 export const links: LinksFunction = () => {
   return [
