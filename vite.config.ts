@@ -45,6 +45,7 @@ export default defineConfig({
           ignoredRouteFiles: ["**/*"],
           serverModuleFormat: "esm",
           future: {
+            unstable_optimizeDeps: true,
             v3_fetcherPersist: true,
             v3_relativeSplatPath: true,
             v3_throwAbortReason: true,
@@ -56,7 +57,7 @@ export default defineConfig({
               ignoredRouteFiles: [
                 ".*",
                 "**/*.css",
-                "**/*.test.{js.jsx,ts.tsx}",
+                "**/*.test.{js,jsx,ts,tsx}",
                 "**/__*.*",
                 // This is for server-side utilities you want to colocate
                 // next to your routes without making an additional
@@ -73,8 +74,8 @@ export default defineConfig({
   ],
   test: {
     include: ["./app/**/*.test.{ts,tsx}"],
-    setupFiles: ["./tests/setup/setup-test-env.ts"],
-    globalSetup: ["./tests/setup/global-setup.ts"],
+    // setupFiles: ["./tests/setup/setup-test-env.ts"],
+    // globalSetup: ["./tests/setup/global-setup.ts"],
     restoreMocks: true,
     coverage: {
       include: ["app/**/*.{ts,tsx}"],
