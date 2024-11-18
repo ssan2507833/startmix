@@ -36,7 +36,7 @@ function clearBrowserExtensionInjectionsBeforeHydration() {
     },
   };
 
-  Object.entries($targets).forEach(([targetName, target]) => {
+  Object.entries($targets).forEach(([_, target]) => {
     target.$elm.getAttributeNames().forEach((attr) => {
       if (!target.allowedAttributes.includes(attr)) {
         target.$elm.removeAttribute(attr);
