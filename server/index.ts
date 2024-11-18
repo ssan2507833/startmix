@@ -115,6 +115,7 @@ app.use(
         "script-src": [
           "'strict-dynamic'",
           "'self'",
+          "chrome-extension:",
           // @ts-expect-error
           (_, res) => `'nonce-${res.locals.cspNonce}'`,
         ],
