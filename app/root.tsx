@@ -14,7 +14,7 @@ import {
 
 import { HoneypotProvider } from "remix-utils/honeypot/react";
 import tailwindStylesheetUrl from "#app/styles/tailwind.css?url";
-import { getHints } from "#app/utils/client-hints";
+import { ClientHintCheck, getHints } from "#app/utils/client-hints";
 import { getEnv } from "#app/utils/env.server";
 import { honeypot } from "#app/utils/honeypot.server";
 import { useNonce } from "#app/utils/nonce-provider";
@@ -60,6 +60,7 @@ function Document({
   return (
     <html lang="en" className={`${theme} h-full overflow-x-hidden`}>
       <head>
+        <ClientHintCheck nonce={nonce} />
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
