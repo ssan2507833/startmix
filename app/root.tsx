@@ -12,9 +12,13 @@ import {
   useLoaderData,
 } from "@remix-run/react";
 
+import { HoneypotProvider } from "remix-utils/honeypot/react";
 import tailwindStylesheetUrl from "#app/styles/tailwind.css?url";
-import { getEnv } from "./utils/env.server";
-import { useNonce } from "./utils/nonce-provider";
+import { getHints } from "#app/utils/client-hints";
+import { getEnv } from "#app/utils/env.server";
+import { honeypot } from "#app/utils/honeypot.server";
+import { useNonce } from "#app/utils/nonce-provider";
+import { getTheme, type Theme } from "#app/utils/theme.server";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: tailwindStylesheetUrl }].filter(Boolean);
@@ -28,20 +32,33 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  return { ENV: getEnv() };
+  const honeyProps = honeypot.getInputProps();
+  return {
+    ENV: getEnv(),
+    honeyProps,
+    requestInfo: {
+      hints: getHints(request),
+      path: new URL(request.url).pathname,
+      userPrefs: {
+        theme: getTheme(request),
+      },
+    },
+  };
 }
 
 function Document({
   children,
   nonce,
+  theme = "light",
   env = {},
 }: {
   children: React.ReactNode;
   nonce: string;
+  theme?: Theme;
   env?: Record<string, string>;
 }) {
   return (
-    <html lang="en" className="h-full overflow-x-hidden">
+    <html lang="en" className={`${theme} h-full overflow-x-hidden`}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -66,8 +83,9 @@ function Document({
 export function Layout({ children }: { children: React.ReactNode }) {
   const data = useLoaderData<typeof loader | null>();
   const nonce = useNonce();
+  const theme = useOptionalTheme();
   return (
-    <Document nonce={nonce} env={data?.ENV}>
+    <Document nonce={nonce} theme={theme} env={data?.ENV}>
       {children}
     </Document>
   );
@@ -78,5 +96,10 @@ function App() {
 }
 
 export default function AppWithProviders() {
-  return <App />;
+  const data = useLoaderData<typeof loader>();
+  return (
+    <HoneypotProvider {...data.honeyProps}>
+      <App />
+    </HoneypotProvider>
+  );
 }
