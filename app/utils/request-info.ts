@@ -2,6 +2,9 @@ import { invariant } from "@epic-web/invariant";
 import { useRouteLoaderData } from "@remix-run/react";
 import { type loader as rootLoader } from "#app/root.tsx";
 
+/**
+ * @returns the request info from the root loader (throws an error if it does not exist)
+ */
 export function useRequestInfo() {
   const maybeRequestInfo = useOptionalRequestInfo();
   invariant(maybeRequestInfo, "No requestInfo found in root loader");
@@ -11,5 +14,6 @@ export function useRequestInfo() {
 
 export function useOptionalRequestInfo() {
   const data = useRouteLoaderData<typeof rootLoader>("root");
+
   return data?.requestInfo;
 }

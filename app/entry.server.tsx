@@ -9,9 +9,10 @@ import { RemixServer } from "@remix-run/react";
 import chalk from "chalk";
 import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
-// import { getEnv, init } from './utils/env.server.ts'
 import { getEnv, init } from "./utils/env.server.ts";
+import { getInstanceInfo } from "./utils/litefs.server.ts";
 import { NonceProvider } from "./utils/nonce-provider.ts";
+import { makeTimings } from "./utils/timing.server.ts";
 // import { makeTimings } from './utils/timing.server.ts'
 
 const ABORT_DELAY = 5000;
@@ -29,6 +30,11 @@ export default async function handleRequest(...args: DocRequestArgs) {
     remixContext,
     loadContext,
   ] = args;
+  const { currentInstance, primaryInstance } = await getInstanceInfo();
+  responseHeaders.set("fly-region", process.env.FLY_REGION ?? "unknown");
+  responseHeaders.set("fly-app", process.env.FLY_APP_NAME ?? "unknown");
+  responseHeaders.set("fly-primary-instance", primaryInstance);
+  responseHeaders.set("fly-instance", currentInstance);
 
   const callbackName = isbot(request.headers.get("user-agent"))
     ? "onAllReady"
@@ -37,6 +43,9 @@ export default async function handleRequest(...args: DocRequestArgs) {
   const nonce = loadContext.cspNonce?.toString() ?? "";
   return new Promise(async (resolve, reject) => {
     let didError = false;
+    // NOTE: this timing will only include things that are rendered in the shell
+    // and will not include suspended components and deferred loaders
+    const timings = makeTimings("render", "renderToPipeableStream");
 
     const { pipe, abort } = renderToPipeableStream(
       <NonceProvider value={nonce}>
@@ -46,6 +55,7 @@ export default async function handleRequest(...args: DocRequestArgs) {
         [callbackName]: () => {
           const body = new PassThrough();
           responseHeaders.set("Content-Type", "text/html");
+          responseHeaders.append("Server-Timing", timings.toString());
           resolve(
             new Response(createReadableStreamFromReadable(body), {
               headers: responseHeaders,
@@ -66,6 +76,16 @@ export default async function handleRequest(...args: DocRequestArgs) {
 
     setTimeout(abort, ABORT_DELAY);
   });
+}
+
+export async function handleDataRequest(response: Response) {
+  const { currentInstance, primaryInstance } = await getInstanceInfo();
+  response.headers.set("fly-region", process.env.FLY_REGION ?? "unknown");
+  response.headers.set("fly-app", process.env.FLY_APP_NAME ?? "unknown");
+  response.headers.set("fly-primary-instance", primaryInstance);
+  response.headers.set("fly-instance", currentInstance);
+
+  return response;
 }
 
 export function handleError(

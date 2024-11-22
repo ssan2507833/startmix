@@ -1,6 +1,6 @@
 import * as cookie from "cookie";
 
-const cookieName = "startmix_theme";
+const cookieName = "en_theme";
 export type Theme = "light" | "dark";
 
 export function getTheme(request: Request): Theme | null {
@@ -14,14 +14,8 @@ export function getTheme(request: Request): Theme | null {
 
 export function setTheme(theme: Theme | "system") {
   if (theme === "system") {
-    return cookie.serialize(cookieName, "", {
-      path: "/",
-      maxAge: -1,
-    });
+    return cookie.serialize(cookieName, "", { path: "/", maxAge: -1 });
   } else {
-    return cookie.serialize(cookieName, theme, {
-      path: "/",
-      maxAge: 31536000,
-    });
+    return cookie.serialize(cookieName, theme, { path: "/", maxAge: 31536000 });
   }
 }

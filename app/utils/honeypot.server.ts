@@ -8,10 +8,10 @@ export const honeypot = new Honeypot({
 export function checkHoneypot(formData: FormData) {
   try {
     honeypot.check(formData);
-  } catch (err: unknown) {
-    if (err instanceof SpamError) {
+  } catch (error) {
+    if (error instanceof SpamError) {
       throw new Response("Form not submitted properly", { status: 400 });
     }
-    throw err;
+    throw error;
   }
 }
