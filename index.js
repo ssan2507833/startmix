@@ -4,6 +4,7 @@ import sourceMapSupport from "source-map-support";
 
 sourceMapSupport.install({
   retrieveSourceMap: function (source) {
+    // get source file without the `file://` prefix or `?t=...` suffix
     const match = source.match(/^file:\/\/(.*)\?t=[.\d]+$/);
     if (match) {
       return {
@@ -14,6 +15,10 @@ sourceMapSupport.install({
     return null;
   },
 });
+
+if (process.env.MOCKS === "true") {
+  await import("./tests/mocks/index.ts");
+}
 
 if (process.env.NODE_ENV === "production") {
   await import("./server-build/index.js");
